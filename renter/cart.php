@@ -12,11 +12,17 @@ $renter = new renter($conn);
 $renter->authenticateRenter();
 
 $userId = $_SESSION['id'];
+$userId = $_SESSION['id'];
 $cartData = $renter->getCartItems($userId);
 
 $cartItems = $cartData['cartItems'];
 $subtotal = $cartData['subtotal'];
 $allAvailable = $cartData['allAvailable'];
+$enableCheckout = $allAvailable && !empty($cartItems);
+if (empty($cartItems)) {
+    $enableCheckout = false;
+    $allAvailable = false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -130,10 +136,12 @@ $allAvailable = $cartData['allAvailable'];
                             <textarea class="form-control mt-2 mb-3" id="order-comments" rows="5" style="font-size:12px;"></textarea>
 
                             <?php if ($allAvailable): ?>
-                                <a class="btn btn-success btn-sm px-3 rounded d-flex justify-content-center" href="checkout.php" type="button">
-                                    <i class="bi bi-credit-card fs-6 pe-2 pt-1"></i>
-                                    Checkout
-                                </a>
+                                <form method="post" action="checkout.php">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+    <button type="submit" class="btn btn-success" <?= $enableCheckout ? '' : 'disabled' ?>>
+        <i class="bi bi-check2-circle me-2"></i>Confirm Order
+    </button>
+</form>
                             <?php else: ?>
                                 <button class="btn btn-success btn-sm px-3 rounded d-flex justify-content-center" type="button" disabled>
                                     <i class="bi bi-credit-card fs-6 pe-2 pt-1"></i>
@@ -205,38 +213,42 @@ $allAvailable = $cartData['allAvailable'];
 
         // Function to send AJAX request to update cart dates
         function updateCartDates(cartId, startDate, endDate) {
-            // Ensure both dates are provided
-            if (!startDate || !endDate) {
-                alert('Both start and end dates must be selected.');
-                return;
-            }
+    if (!startDate || !endDate) {
+        alert('Both start and end dates must be selected.');
+        return;
+    }
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'update_cart_dates.php', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.success) {
-                                console.log('Cart dates updated successfully.');
-                                // Optionally, display a success message to the user
-                            } else {
-                                alert('Failed to update dates: ' + response.message);
-                            }
-                        } catch (e) {
-                            alert('Invalid server response.');
-                        }
-                    } else {
-                        alert('An error occurred while updating dates.');
-                    }
-                }
-            };
-            xhr.send('cart_id=' + encodeURIComponent(cartId) + 
-                     '&start_date=' + encodeURIComponent(startDate) + 
-                     '&end_date=' + encodeURIComponent(endDate));
+    const formData = new URLSearchParams();
+    formData.append('cart_id', cartId);
+    formData.append('start_date', startDate);
+    formData.append('end_date', endDate);
+
+    fetch('update_cart_dates.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Optionally refresh the cart or update the UI
+            console.log('Dates updated');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update dates. Please try again.');
+    });
+}
     </script>
 </body>
 </html>

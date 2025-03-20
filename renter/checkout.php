@@ -11,6 +11,8 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 
+
+
 $userId = $_SESSION['id'];
 $cartItems = [];
 $subtotal = 0;
@@ -21,6 +23,18 @@ $taxAmount = 0;
 $total = 0;
 $isDirectCheckout = false;
 $allAvailable = true;
+
+$isDirectCheckout = isset($_POST['direct_checkout']) && $_POST['direct_checkout'] == 1;
+$productId = $isDirectCheckout ? (int)$_POST['product_id'] : null;
+$startDate = $isDirectCheckout ? $_POST['start_date'] : null;
+$endDate = $isDirectCheckout ? $_POST['end_date'] : null;
+
+// Validate direct checkout parameters
+if ($isDirectCheckout && (!$productId || !$startDate || !$endDate)) {
+    $_SESSION['error_message'] = "Missing required checkout parameters.";
+    header('Location: browse.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direct_checkout'])) {
     $isDirectCheckout = true;
@@ -222,12 +236,10 @@ if (empty($_SESSION['csrf_token'])) {
                                         <div class="mb-3">
                                             <form method="post" action="process_checkout.php" class="needs-validation" novalidate>
                                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-                                                <input type="hidden" name="direct_checkout" value="1">
                                                 <input type="hidden" name="product_id" value="<?= $productId ?>">
                                                 <input type="hidden" name="start_date" value="<?= $startDate ?>">
                                                 <input type="hidden" name="end_date" value="<?= $endDate ?>">
                                                 <?php if ($isDirectCheckout): ?>
-                                                    <input type="hidden" name="direct_checkout" value="1">
                                                     <input type="hidden" name="product_id" value="<?= htmlspecialchars($productId); ?>">
                                                     <input type="hidden" name="start_date" value="<?= htmlspecialchars($startDate); ?>">
                                                     <input type="hidden" name="end_date" value="<?= htmlspecialchars($endDate); ?>">
@@ -316,6 +328,7 @@ if (empty($_SESSION['csrf_token'])) {
                                         </thead>
                                         <tbody>
                                             <?php foreach ($cartItems as $item): ?>
+                                                
                                                 <tr>
                                                     <th scope="row">
                                                         <img src="../img/uploads/<?= htmlspecialchars($item['image']); ?>" alt="product-img" title="product-img" class="rounded" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.onerror=null; this.src='../img/uploads/default.png';">

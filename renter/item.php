@@ -196,7 +196,7 @@ $productData = [
                                     <!-- Direct Checkout Indicator -->
                                     <input type="hidden" name="direct_checkout" value="1">
                                     <!-- Product Details -->
-                                    <input type="hidden" name="product_id" value="<?= $productData['id']; ?>">
+                                    <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
                                     <input type="hidden" name="start_date" id="checkout_start_date" value="">
                                     <input type="hidden" name="end_date" id="checkout_end_date" value="">
                                     <button type="submit" class="px-3 py-2 btn rounded-pill shadow-sm btn-success d-flex align-items-center gap-2" <?php echo ($productData['quantity'] < 1) ? 'disabled' : ''; ?>>
@@ -378,6 +378,19 @@ $productData = [
             }
         });
 
+        document.querySelector('form[action="checkout.php"]').addEventListener('submit', function(e) {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    if (!startDate || !endDate) {
+        e.preventDefault();
+        alert('Please select both start and end dates.');
+    } else {
+        // Update hidden inputs for checkout
+        document.getElementById('checkout_start_date').value = startDate;
+        document.getElementById('checkout_end_date').value = endDate;
+    }
+});
         // Calculate total rental price based on selected dates
         function calculateTotal() {
             const startDateInput = document.getElementById('startDate');

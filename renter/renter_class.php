@@ -48,10 +48,15 @@ class renter {
 
     //Browse Page
     // Search and paginate products excluding 'pending_confirmation' status
-    public function searchProducts($searchTerm = '', $limit = 8, $page = 1) {
-        $offset = ($page - 1) * $limit;
-    
-        // Corrected SQL with proper rating calculation
+    public function searchProducts(
+        string $searchTerm = '', 
+        int $perPage = 8, 
+        int $page = 1, 
+        bool $excludeOwnProducts = false, 
+        int $currentUserId = null
+    ) {
+        $offset = ($page - 1) * $perPage;
+        
         $sql = "
             SELECT 
                 p.*,
@@ -67,63 +72,74 @@ class renter {
                     JOIN rentals rl ON r.rental_id = rl.id 
                     WHERE rl.product_id = p.id
                 ), 0) AS rating_count
-            FROM 
-                products p
-            WHERE 
-                (p.name LIKE :searchTerm OR p.description LIKE :searchTerm)
-                AND p.status IN ('available', 'rented')
-            LIMIT :limit OFFSET :offset
+            FROM products p
+            WHERE (p.name LIKE :search OR p.description LIKE :search)
+            AND p.status IN ('available', 'rented')
         ";
     
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%');
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-        $allProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-        // Total count query (fix status filter)
-        $totalProductsSql = "
-            SELECT COUNT(*) as total 
-            FROM products 
-            WHERE 
-                (name LIKE :searchTerm OR description LIKE :searchTerm)
-                AND status IN ('available', 'rented')
+        $countSql = "
+            SELECT COUNT(*) 
+            FROM products p
+            WHERE (p.name LIKE :search OR p.description LIKE :search)
+            AND p.status IN ('available', 'rented')
         ";
-        $stmt = $this->conn->prepare($totalProductsSql);
-        $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%');
-        $stmt->execute();
-        $totalProducts = $stmt->fetch()['total'];
-        $totalPages = ceil($totalProducts / $limit);
-
-        // Format the product data
-        $formattedProducts = [];
-        foreach ($allProducts as $product) {
-            $averageRating = round(floatval($product['average_rating']), 1);
-            $ratingCount = intval($product['rating_count']);
-
-            $formattedProducts[] = [
-                'id' => $product['id'],
-                'owner_id' => $product['owner_id'],
-                'name' => htmlspecialchars($product['name']),
-                'brand' => htmlspecialchars($product['brand']),
-                'description' => htmlspecialchars($product['description']),
-                'rental_price' => number_format($product['rental_price'], 2),
-                'status' => htmlspecialchars($product['status']),
-                'created_at' => $product['created_at'],
-                'updated_at' => $product['updated_at'],
-                'image' => $product['image'],
-                'quantity' => $product['quantity'],
-                'category' => htmlspecialchars($product['category']),
-                'rental_period' => htmlspecialchars($product['rental_period']),
-                'average_rating' => $averageRating,
-                'rating_count' => $ratingCount
-            ];
+    
+        // Add owner exclusion only when in renter mode
+        if ($excludeOwnProducts && $currentUserId) {
+            $sql .= " AND p.owner_id != :owner_id";
+            $countSql .= " AND p.owner_id != :owner_id";
         }
-
-        return ['products' => $formattedProducts, 'totalPages' => $totalPages];
+    
+        $sql .= " LIMIT :limit OFFSET :offset";
+    
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue(':search', '%' . $searchTerm . '%');
+            
+            if ($excludeOwnProducts && $currentUserId) {
+                $stmt->bindValue(':owner_id', $currentUserId, PDO::PARAM_INT);
+            }
+            
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            // Total count
+            $countStmt = $this->conn->prepare($countSql);
+            $countStmt->bindValue(':search', '%' . $searchTerm . '%');
+            
+            if ($excludeOwnProducts && $currentUserId) {
+                $countStmt->bindValue(':owner_id', $currentUserId, PDO::PARAM_INT);
+            }
+            
+            $countStmt->execute();
+            $totalProducts = $countStmt->fetchColumn();
+    
+            // Format results
+            $formatted = array_map(function($product) {
+                return [
+                    'id' => $product['id'],
+                    'owner_id' => $product['owner_id'],
+                    'name' => htmlspecialchars($product['name']),
+                    'description' => htmlspecialchars($product['description']),
+                    'rental_price' => number_format($product['rental_price'], 2),
+                    'image' => $product['image'],
+                    'average_rating' => round($product['average_rating'], 1),
+                    'rating_count' => (int)$product['rating_count']
+                ];
+            }, $products);
+    
+            return [
+                'products' => $formatted,
+                'totalPages' => ceil($totalProducts / $perPage)
+            ];
+    
+        } catch (PDOException $e) {
+            error_log("Search error: " . $e->getMessage());
+            return false;
+        }
     }
-
 
 
 
@@ -183,9 +199,8 @@ public function fileDispute($userId, $rental_id, $reason, $description) {
 //Item Page
 // Method to fetch product by ID
 public function getProductById($productId) {
-    $stmt = $this->conn->prepare("SELECT * FROM products WHERE id = :productId");
-    $stmt->bindParam(':productId', $productId, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->conn->prepare("SELECT * FROM products WHERE id = ? AND status IN ('available', 'rented')");
+    $stmt->execute([$productId]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
@@ -541,6 +556,7 @@ private function uploadFile($file) {
     return '/rb/uploads/proofs/' . $filename; // Add /rb/ here
 }
 
+
 // Check overdue status
 public function checkOverdueStatus($rentalId, $currentStatus, $endDate) {
     if (in_array($currentStatus, ['renting', 'delivered']) && date('Y-m-d') > $endDate) {
@@ -869,6 +885,11 @@ public function getRentalsByStatus($userId, $statuses = []) {
     $stmt->execute($params);
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function removeFromCart($cartItemId) {
+    $stmt = $this->conn->prepare("DELETE FROM cart_items WHERE id = ?");
+    return $stmt->execute([$cartItemId]);
 }
 }
 ?>

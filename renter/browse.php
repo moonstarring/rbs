@@ -16,8 +16,7 @@ $renter->authenticateRenter();
 $searchTerm = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
-// Fetch products and pagination info
-$result = $renter->searchProducts($searchTerm, 8, $page);
+$result = $renter->searchProducts($searchTerm, 8, $page, $_SESSION['id']);
 if (!$result) {
     die("Error fetching products.");
 }
