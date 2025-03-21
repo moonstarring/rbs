@@ -74,7 +74,7 @@ if (isset($_POST['become_renter'])) {
             $updateStmt = $conn->prepare($updateQuery);
             $updateStmt->execute(['user_id' => $userId]);
             
-            // Redirect to the renter dashboard
+            $_SESSION['role'] = 'renter';
             header('Location: ../renter/browse.php');
             exit;
         } else {

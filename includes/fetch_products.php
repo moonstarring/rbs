@@ -26,71 +26,79 @@ try {
     die(json_encode(['error' => 'Connection failed: ' . $e->getMessage()]));
 }
 
+// ... existing code ...
+
 try {
-    // Get parameters from request
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $limit = 8;
     $offset = ($page - 1) * $limit;
     $sort = $_GET['sort'] ?? 'newest';
-    $categories = isset($_GET['categories']) ? explode(',', $_GET['categories']) : [];
+    $categoriesParam = $_GET['categories'] ?? '';
+    $categories = $categoriesParam !== '' ? explode(',', $categoriesParam) : [];
+    $excludeUserId = isset($_SESSION['id']) ? $_SESSION['id'] : null;
 
-    // Validate categories
-    $validCategories = [
-        'Mobile Phones', 'Laptops', 'Tablets', 'Cameras',
-        'Accessories', 'Gaming Consoles', 'Audio Devices', 'Drones'
-    ];
-    foreach ($categories as $category) {
-        if (!in_array($category, $validCategories)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Invalid category: ' . $category]);
-            exit;
-        }
-    }
-
-    // Validate sort parameter
-    $validSorts = ['newest', 'top_rated'];
-    if (!in_array($sort, $validSorts)) {
-        throw new Exception('Invalid sort parameter');
-    }
-
-    // Build main query
+    // Base SQL with exclusion for owner_id (using positional parameters)
     $sql = "SELECT 
                 p.*, 
-                COALESCE(AVG(c.rating), 0) AS average_rating,
-                COUNT(c.id) AS rating_count
+                COALESCE(AVG(r.rating), 0) AS average_rating,
+                COUNT(DISTINCT r.id) AS rating_count
             FROM products p
-            LEFT JOIN comments c ON p.id = c.product_id
-            WHERE p.status = 'approved'";
+            LEFT JOIN reviews r ON p.id = r.rental_id
+            WHERE p.status = 'available'";
+
+    $countSql = "SELECT COUNT(DISTINCT p.id) as total 
+                 FROM products p 
+                 WHERE p.status = 'available'";
+
+    $params = [];
+    $countParams = [];
+
+    // Add owner exclusion
+    if ($excludeUserId) {
+        $sql .= " AND p.owner_id != ?";
+        $countSql .= " AND p.owner_id != ?";
+        $params[] = $excludeUserId;
+        $countParams[] = $excludeUserId;
+    }
 
     // Add category filter
-    $categoryParams = [];
-    if (!empty($categories)) {
-        $placeholders = implode(',', array_fill(0, count($categories), '?'));
+    if (!empty($categories) && $categories[0] !== '') {
+        $placeholders = str_repeat('?,', count($categories) - 1) . '?';
         $sql .= " AND p.category IN ($placeholders)";
-        $categoryParams = $categories;
+        $countSql .= " AND p.category IN ($placeholders)";
+        $params = array_merge($params, $categories);
+        $countParams = array_merge($countParams, $categories);
     }
 
-    // Always group by product ID
     $sql .= " GROUP BY p.id";
-
-    // Add rating filter for top rated
-    if ($sort === 'top_rated') {
-        $sql .= " HAVING average_rating > 0";
-    }
 
     // Add sorting
     switch ($sort) {
-        case 'newest':
-            $sql .= " ORDER BY p.created_at DESC";
-            break;
         case 'top_rated':
-            $sql .= " ORDER BY average_rating DESC";
+            $sql .= " ORDER BY average_rating DESC, p.created_at DESC";
+            break;
+        case 'newest':
+        default:
+            $sql .= " ORDER BY p.created_at DESC";
             break;
     }
 
-    // Add pagination
     $sql .= " LIMIT ? OFFSET ?";
+    $params[] = $limit;
+    $params[] = $offset;
 
+    // Execute main query
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    // Execute count query
+    $countStmt = $pdo->prepare($countSql);
+    $countStmt->execute($countParams);
+
+    $totalItems = (int)$countStmt->fetch()['total'];
+    $totalPages = ceil($totalItems / $limit);
+
+    // ... rest of the code ...
     // Prepare and execute main query
     $stmt = $pdo->prepare($sql);
     

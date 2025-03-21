@@ -78,7 +78,7 @@ if (isset($_POST['become_owner'])) {
             $updateStmt = $conn->prepare($updateQuery);
             $updateStmt->execute(['user_id' => $userId]);
             
-            // Redirect to the owner dashboard
+            $_SESSION['role'] = 'owner';
             header('Location: ../owner/dashboard.php');
             exit;
         } else {

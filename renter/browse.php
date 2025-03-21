@@ -1,9 +1,18 @@
 <?php
-//browse.php
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Debugging
+error_log("User ID in session: " . ($_SESSION['id'] ?? 'Not set'));
+error_log("User role in session: " . ($_SESSION['role'] ?? 'Not set'));
+
+// Make sure the session ID is set before using it
+if (!isset($_SESSION['id'])) {
+    // Redirect to login or handle the error
+    header('Location: /rb/login.php');
+    exit;
+}
 // Include database connection
 require_once __DIR__ . '/../db/db.php';
 require_once 'renter_class.php';
@@ -16,7 +25,19 @@ $renter->authenticateRenter();
 $searchTerm = isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
-$result = $renter->searchProducts($searchTerm, 8, $page, $_SESSION['id']);
+$result = $renter->searchProducts(
+    searchTerm: $searchTerm,
+    perPage: 8,
+    page: $page,
+    excludeOwnProducts: true,
+    currentUserId: $_SESSION['id']
+);
+
+if ($result) {
+    echo "<!-- Found {$result['totalPages']} pages of products -->";
+} else {
+    echo "<!-- Error in searchProducts method -->";
+}
 if (!$result) {
     die("Error fetching products.");
 }

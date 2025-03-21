@@ -99,6 +99,6 @@ $csrfToken = $admin->generateCsrfToken();
         </div>
     </div>
 </div>
-<!-- Keep script section from original -->
+
 </body>
 </html>
