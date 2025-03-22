@@ -11,13 +11,13 @@ if (isset($_SESSION['id'])) {
     $userId = $_SESSION['id'];
     
     try {
-        // Check user details - Modified to use first/last names
+        // Modified query to get user data
         $query = "
             SELECT 
                 CONCAT_WS(' ', users.first_name, users.last_name) AS name,
                 users.role, 
                 users.profile_picture, 
-                user_verification.verification_status 
+                COALESCE(user_verification.verification_status, 'pending') AS verification_status
             FROM users
             LEFT JOIN user_verification ON users.id = user_verification.user_id
             WHERE users.id = :user_id
@@ -27,33 +27,40 @@ if (isset($_SESSION['id'])) {
         $stmt->execute(['user_id' => $userId]);
         $user = $stmt->fetch();
         
-        if ($user && $user['verification_status'] === 'verified') {
+        if ($user) {
             $username = $user['name'];
             $userRole = $user['role'];
             
-            // Check if profile picture exists
-            if ($user['profile_picture'] && file_exists($_SERVER['DOCUMENT_ROOT'] . '/rb/' . $user['profile_picture'])) {
-                $profilePic = '/rb/' . $user['profile_picture'];
-            } else {
-                $profilePic = '/rb/owner/includes/user.png';
+            // Correct path handling
+            $profilePic = '/owner/includes/user.png'; // Default image
+            if (!empty($user['profile_picture'])) {
+                $correctedPath = (strpos($user['profile_picture'], '/') === 0)
+                    ? $user['profile_picture'] 
+                    : '/' . $user['profile_picture'];
+                
+                // Check file existence using document root
+                $fullPath = $_SERVER['DOCUMENT_ROOT'] . $correctedPath;
+                if (file_exists($fullPath)) {
+                    $profilePic = $correctedPath;
+                }
             }
         } else {
+            // Handle invalid user session
             $username = 'Guest';
             $userRole = 'renter';
-            $profilePic = '/rb/owner/includes/user.png';
+            $profilePic = '/owner/includes/user.png';
         }
     } catch(PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         $username = 'Guest';
         $userRole = 'renter';
-        $profilePic = '/rb/owner/includes/user.png';
+        $profilePic = '/owner/includes/user.png';
     }
 } else {
     $username = 'Guest';
     $userRole = 'renter';
-    $profilePic = '/rb/owner/includes/user.png';
+    $profilePic = '/owner/includes/user.png';
 }
-
 // Handle the "Become an Owner" button click
 if (isset($_POST['become_owner'])) {
     try {

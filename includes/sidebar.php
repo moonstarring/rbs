@@ -1,18 +1,7 @@
 <?php
 //sidebar.php
 // Database connection
-$servername = "localhost";
-$username = "root"; // Update with your database username
-$password = ""; // Update with your database password
-$dbname = "PROJECT"; // Use your database name
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once __DIR__ . '/../db/db.php'; 
 
 ?>
 <style>
@@ -128,7 +117,7 @@ async function updateProducts() {
             queryParams.append('categories', selectedCategories.join(','));
         }
 
-        const response = await fetch(`fetch_products.php?${queryParams.toString()}`);
+   
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -149,7 +138,7 @@ async function updateProducts() {
             elements.productList.innerHTML = `
                 <div class="alert alert-danger m-3">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    Error loading products: ${error.message}
+                    Error loading product: ${error.message}
                 </div>`;
         }
     } finally {
@@ -184,9 +173,11 @@ function updateProductList(products) {
                         </a>
                         <div class="d-flex justify-content-between align-items-baseline">
                             <small class="ms-1 mb-0 text-secondary">
-                                <i class="bi bi-star-fill text-warning me-1"></i>
-                                ${product.average_rating} (${product.rating_count})
-                            </small>
+    <i class="bi bi-star-fill text-warning me-1"></i>
+${product.rating_count > 0 
+    ? `${product.average_rating.toFixed(1)} (${product.rating_count})` 
+    : 'No ratings'}
+</small>
                             <p class="fs-5 ms-auto mb-0">₱${product.rental_price}<small class="text-secondary">/day</small></p>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">

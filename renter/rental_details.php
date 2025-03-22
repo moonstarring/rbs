@@ -19,10 +19,16 @@ if (!$rentalId) {
     exit();
 }
 
-// Add this in the POST handling block (after CSRF verification)
+$rental = $renter->getRentalDetails($renterId, $rentalId);
+if (!$rental) {
+    $_SESSION['error'] = "Rental not found";
+    header('Location: rentals.php');
+    exit();
+}
+// Feedback submission handling
 if (isset($_POST['submit_feedback'])) {
     try {
-        // Validate feedback data
+        // Validate input
         $productRating = filter_input(INPUT_POST, 'product_rating', FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1, 'max_range' => 5]
         ]);
@@ -36,65 +42,102 @@ if (isset($_POST['submit_feedback'])) {
             throw new Exception("All feedback fields are required and must be valid.");
         }
 
-        // Save feedback - no proof file required anymore
-        $renter->submitFeedback(
-            $rentalId,
+        // Start transaction
+        $conn->beginTransaction();
+
+        // Insert product feedback
+        $stmt = $conn->prepare("
+            INSERT INTO comments 
+                (product_id, renter_id, rating, comment, created_at)
+            VALUES (?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([
+            $rental['product_id'],
+            $renterId,
             $productRating,
-            $productComment,
+            $productComment
+        ]);
+
+        // Insert owner review
+        $stmt = $conn->prepare("
+            INSERT INTO owner_reviews 
+                (owner_id, renter_id, rental_id, rating, comment, created_at)
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([
+            $rental['owner_id'],
+            $renterId,
+            $rentalId,
             $ownerRating,
             $ownerComment
-        );
+        ]);
 
+        // Check if owner has already submitted feedback
+        $ownerFeedbackCheck = $conn->prepare("
+            SELECT id FROM renter_reviews 
+            WHERE rental_id = ?
+        ");
+        $ownerFeedbackCheck->execute([$rentalId]);
+        
+        // Update status to completed only if both parties have submitted feedback
+        if ($ownerFeedbackCheck->rowCount() > 0) {
+            $stmt = $conn->prepare("
+                UPDATE rentals 
+                SET status = 'completed' 
+                WHERE id = ?
+            ");
+            $stmt->execute([$rentalId]);
+        } else {
+            // Update to returned if only renter has submitted
+            $stmt = $conn->prepare("
+                UPDATE rentals 
+                SET status = 'returned' 
+                WHERE id = ?
+            ");
+            $stmt->execute([$rentalId]);
+        }
+
+        $conn->commit();
+        if ($renter->hasReceivedFeedbackFromOwner($rentalId)) {
+            $renter->updateRentalStatus($rentalId, 'completed');
+        } else {
+            $renter->updateRentalStatus($rentalId, 'returned');
+        }
         $_SESSION['success'] = "Feedback submitted successfully!";
         header("Location: rental_details.php?rental_id=" . $rentalId);
         exit();
 
     } catch (Exception $e) {
+        $conn->rollBack();
         $_SESSION['error'] = $e->getMessage();
         header("Location: rental_details.php?rental_id=" . $rentalId);
         exit();
     }
 }
 
+// Get rental data
 
-$rental = $renter->getRentalDetails($renterId, $rentalId);
+$currentStatus = $rental['status']; 
 $allProofs = $renter->getProofs($rentalId);
 $today = new DateTime('today');
 $originalEndDate = new DateTime($rental['end_date']);
-$currentEndDate = new DateTime($rental['end_date']); // Will be updated if frozen
+$currentEndDate = new DateTime($rental['end_date']);
 $remainingDays = $currentEndDate->diff($today)->days;
 $isFrozen = $rental['end_date'] != $originalEndDate->format('Y-m-d');
 
-if (!$rental) {
-    $_SESSION['error'] = "Rental not found";
-    header('Location: rentals.php');
-    exit();
-}
 
+// Handle other POST actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Debug: Check received token
-        error_log("Received token: " . ($_POST['csrf_token'] ?? 'NONE'));
-        error_log("Session token: " . ($_SESSION['csrf_token'] ?? 'NONE'));
-
-        // Verify CSRF token using renter's method
         if (!$renter->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
             throw new Exception("Security verification failed. Please refresh the page and try again.");
         }
 
-        // Handle different actions
         if (isset($_POST['end_rental'])) {
-            // Handle rental termination
             $renter->endRental($rentalId);
             $_SESSION['success'] = "Rental successfully terminated!";
-        } 
-        elseif (isset($_POST['initiate_return'])) {
-            // Handle return initiation
-            $renter->initiateReturn($rentalId, $_FILES['return_proof']);
-            $_SESSION['success'] = "Return process started!";
         }
 
-        // Redirect back to prevent resubmission
         header("Location: rental_details.php?rental_id=" . $rentalId);
         exit();
 
@@ -105,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
+// Prepare proofs data
 $proofsByType = [
     'handed_over_to_admin' => [],
     'picked_up' => [],
@@ -119,19 +162,16 @@ foreach ($allProofs as $proof) {
     }
 }
 
-$owner_delivery_proofs = [];
-$renter_delivery_proofs = [];
-$return_proofs = [];
-$currentStatus = $rental['status'];
+// Check feedback status
 $hasFeedback = $renter->checkFeedback($rental['product_id'], $renterId);
 $hasOwnerReview = $renter->checkOwnerReview($rentalId, $renterId);
 
+// Status flow configuration
 $statusFlow = [
     'pending_confirmation' => 'Pending',
     'approved' => 'Approved',
     'ready_for_pickup' => 'Ready for Pickup',
     'picked_up' => 'In Possession',
-    'return_pending' => 'Return Initiated',
     'returned' => 'Return Completed',
     'completed' => 'Completed'
 ];
@@ -139,7 +179,9 @@ $statusFlow = [
 if (!array_key_exists($currentStatus, $statusFlow)) {
     $currentStatus = 'pending';
 }
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -241,6 +283,8 @@ if (!array_key_exists($currentStatus, $statusFlow)) {
                 
                 <?php if (!in_array($key, ['pending_confirmation', 'approved'])): ?>
     <?php 
+
+    
     $proofType = match($key) {
         'ready_for_pickup' => 'handed_over_to_admin',
         'picked_up' => 'picked_up',

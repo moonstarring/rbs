@@ -11,8 +11,6 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 
-
-
 $userId = $_SESSION['id'];
 $cartItems = [];
 $subtotal = 0;
@@ -24,30 +22,22 @@ $total = 0;
 $isDirectCheckout = false;
 $allAvailable = true;
 
+// Check if it's direct checkout (from browse.php) or cart checkout
 $isDirectCheckout = isset($_POST['direct_checkout']) && $_POST['direct_checkout'] == 1;
 $productId = $isDirectCheckout ? (int)$_POST['product_id'] : null;
 $startDate = $isDirectCheckout ? $_POST['start_date'] : null;
 $endDate = $isDirectCheckout ? $_POST['end_date'] : null;
 
-// Validate direct checkout parameters
-if ($isDirectCheckout && (!$productId || !$startDate || !$endDate)) {
-    $_SESSION['error_message'] = "Missing required checkout parameters.";
-    header('Location: browse.php');
-    exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direct_checkout'])) {
-    $isDirectCheckout = true;
-    $productId = intval($_POST['product_id']);
-    $startDate = $_POST['start_date'];
-    $endDate = $_POST['end_date'];
-
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        $_SESSION['error_message'] = "Invalid CSRF token.";
-        header('Location: item.php?id=' . $productId);
+// Handle Direct Checkout (From browse.php)
+if ($isDirectCheckout) {
+    // Validate direct checkout parameters
+    if (!$productId || !$startDate || !$endDate) {
+        $_SESSION['error_message'] = "Missing required checkout parameters.";
+        header('Location: browse.php');
         exit();
     }
 
+    // Validate dates
     $dateFormat = 'Y-m-d';
     $startDateObj = DateTime::createFromFormat($dateFormat, $startDate);
     $endDateObj = DateTime::createFromFormat($dateFormat, $endDate);
@@ -64,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direct_checkout'])) {
         exit();
     }
 
+    // Fetch product data
     $sql = "SELECT * FROM products WHERE id = :productId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':productId', $productId, PDO::PARAM_INT);
@@ -80,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direct_checkout'])) {
         $allAvailable = false;
     }
 
+    // Calculate total cost based on rental period
     $rentalPeriod = strtolower($product['rental_period']);
     $interval = $startDateObj->diff($endDateObj);
     $days = $interval->days + 1;
@@ -113,9 +105,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direct_checkout'])) {
         'periods' => $periods,
         'total_cost' => $totalCost,
     ];
-} else {
-    $isDirectCheckout = false;
-
+}
+// Handle Cart Checkout (From cart.php)
+else {
     $sql = "SELECT c.*, p.name, p.image, p.rental_price, p.category, p.description, p.owner_id, p.rental_period, p.quantity
             FROM cart_items c
             INNER JOIN products p ON c.product_id = p.id
@@ -138,6 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direct_checkout'])) {
                 break;
             }
 
+            // Calculate rental period
             $rentalPeriod = strtolower($item['rental_period']);
             $startDateObj = new DateTime($item['start_date']);
             $endDateObj = new DateTime($item['end_date']);
@@ -239,11 +232,13 @@ if (empty($_SESSION['csrf_token'])) {
                                                 <input type="hidden" name="product_id" value="<?= $productId ?>">
                                                 <input type="hidden" name="start_date" value="<?= $startDate ?>">
                                                 <input type="hidden" name="end_date" value="<?= $endDate ?>">
-                                                <?php if ($isDirectCheckout): ?>
-                                                    <input type="hidden" name="product_id" value="<?= htmlspecialchars($productId); ?>">
-                                                    <input type="hidden" name="start_date" value="<?= htmlspecialchars($startDate); ?>">
-                                                    <input type="hidden" name="end_date" value="<?= htmlspecialchars($endDate); ?>">
-                                                <?php endif; ?>
+<!-- Inside the form in checkout.php -->
+<?php if ($isDirectCheckout): ?>
+    <input type="hidden" name="direct_checkout" value="1"> <!-- Add this line -->
+    <input type="hidden" name="product_id" value="<?= htmlspecialchars($productId); ?>">
+    <input type="hidden" name="start_date" value="<?= htmlspecialchars($startDate); ?>">
+    <input type="hidden" name="end_date" value="<?= htmlspecialchars($endDate); ?>">
+<?php endif; ?>
 
                                                <!-- Your Information Section -->
 <div class="card mb-3"> <!-- Changed from mb-4 -->

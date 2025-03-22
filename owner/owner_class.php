@@ -798,6 +798,33 @@ class owner {
         }
     }
 
+    public function hasGivenFeedbackToRenter($rentalId) {
+        $stmt = $this->conn->prepare("
+            SELECT id FROM renter_reviews 
+            WHERE rental_id = ? AND owner_id = ?
+        ");
+        $stmt->execute([$rentalId, $this->userId]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function hasReceivedFeedbackFromRenter($rentalId) {
+        $stmt = $this->conn->prepare("
+            SELECT id FROM owner_reviews 
+            WHERE rental_id = ?
+        ");
+        $stmt->execute([$rentalId]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function updateRentalStatus($rentalId, $status) {
+        $stmt = $this->conn->prepare("
+            UPDATE rentals 
+            SET status = ?, updated_at = NOW()
+            WHERE id = ?
+        ");
+        return $stmt->execute([$status, $rentalId]);
+    }
+
     public function handleAdminHandover($rentalId, $files) {
         // 1. Create admin assignments
         $admins = $this->conn->query("SELECT id FROM users WHERE role = 'admin'")

@@ -38,12 +38,12 @@ try {
     $excludeUserId = $_SESSION['id'] ?? null;
 
     // Base SQL queries
-    $baseSql = "SELECT p.*, 
-                COALESCE(AVG(r.rating), 0) AS average_rating,
-                COUNT(DISTINCT r.id) AS rating_count
-                FROM products p
-                LEFT JOIN reviews r ON p.id = r.rental_id
-                WHERE p.status = 'available'";
+$baseSql = "SELECT p.*, 
+            COALESCE(AVG(c.rating), 0) AS average_rating,
+            COUNT(c.id) AS rating_count
+            FROM products p
+            LEFT JOIN comments c ON p.id = c.product_id
+            WHERE p.status = 'available'";
 
     $countSql = "SELECT COUNT(DISTINCT p.id) FROM products p WHERE p.status = 'available'";
 

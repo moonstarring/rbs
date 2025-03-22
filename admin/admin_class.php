@@ -969,7 +969,7 @@ public function uploadRentalProof($rentalId, $proofType, $proofFiles, $descripti
     if (!in_array($proofType, $allowedProofTypes)) {
         throw new Exception("Invalid proof type: " . $proofType);
     }
-    $uploadDir = '/Applications/XAMPP/xamppfiles/htdocs/rb/uploads/proofs/';
+    $uploadDir = '../uploads/proofs/';
     if (!is_dir($uploadDir)) {
         throw new Exception("Upload directory does not exist: " . $uploadDir);
     }

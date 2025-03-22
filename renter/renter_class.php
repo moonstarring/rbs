@@ -641,6 +641,34 @@ public function checkFeedback($productId, $renterId) {
     }
 }
 
+public function hasGivenFeedbackToOwner($rentalId) {
+    $stmt = $this->conn->prepare("
+        SELECT id FROM owner_reviews 
+        WHERE rental_id = ? AND renter_id = ?
+    ");
+    $stmt->execute([$rentalId, $this->userId]);
+    return $stmt->rowCount() > 0;
+}
+
+public function hasReceivedFeedbackFromOwner($rentalId) {
+    $stmt = $this->conn->prepare("
+        SELECT id FROM renter_reviews 
+        WHERE rental_id = ?
+    ");
+    $stmt->execute([$rentalId]);
+    return $stmt->rowCount() > 0;
+}
+
+public function updateRentalStatus($rentalId, $status) {
+    $stmt = $this->conn->prepare("
+        UPDATE rentals 
+        SET status = ?, updated_at = NOW()
+        WHERE id = ?
+    ");
+    return $stmt->execute([$status, $rentalId]);
+}
+
+
 // Check owner review
 public function checkOwnerReview($rentalId, $renterId) {
     try {

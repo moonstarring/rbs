@@ -26,17 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $action = $_POST['action'];
         $owner->handleRentalAction($rentalId, $action, $_POST, $_FILES);
 
-        // Fetch the updated rental details to get the current status after cancellation
         $rental = $owner->getRentalDetails($rentalId);
         $currentStatus = $rental['status'];
-
-        // Get the status flow
-        $statusFlow = $owner->getStatusFlow();
-
-        // Filter out the 'cancelled' status from the status flow
-        $filteredStatusFlow = array_filter($statusFlow, function ($key) {
-            return $key !== 'cancelled'; // Exclude 'cancelled' status
-        }, ARRAY_FILTER_USE_KEY);
 
         $_SESSION['success'] = "Rental has been $action.";
     } catch (Exception $e) {
@@ -47,14 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     exit();
 }
 
-
-if (!($rental = $owner->getRentalDetails($rentalId))) {
-    $_SESSION['error'] = "Rental not found.";
-    header('Location: rentals.php');
-    exit();
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
+    // Validate inputs
     $renterRating = filter_input(INPUT_POST, 'renter_rating', FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1, 'max_range' => 5]
     ]);
@@ -64,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
     $renterComment = filter_input(INPUT_POST, 'renter_comment', FILTER_SANITIZE_SPECIAL_CHARS);
     $productComment = filter_input(INPUT_POST, 'product_comment', FILTER_SANITIZE_SPECIAL_CHARS);
 
-    // Strict validation
     if (!$renterRating || !$productRating || !$renterComment || !$productComment) {
         $_SESSION['error'] = "All fields are required, and ratings must be between 1 and 5.";
         header("Location: view_rental.php?rental_id=$rentalId");
@@ -74,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
     try {
         $conn->beginTransaction();
         
-        // Insert into renter_reviews
+        // Insert renter review
         $stmt = $conn->prepare("
             INSERT INTO renter_reviews 
                 (renter_id, owner_id, rental_id, rating, comment, created_at)
@@ -88,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
             $renterComment
         ]);
         
-        // Insert into comments
+        // Insert product comment
         $stmt = $conn->prepare("
             INSERT INTO comments 
                 (product_id, renter_id, rating, comment, created_at)
@@ -101,7 +85,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
             $productComment
         ]);
 
+        // Check if renter has submitted feedback
+        $renterFeedbackExists = $conn->prepare("
+            SELECT id FROM owner_reviews 
+            WHERE rental_id = ?
+        ");
+        $renterFeedbackExists->execute([$rentalId]);
+        
+        // Update status based on mutual feedback
+        if ($renterFeedbackExists->rowCount() > 0) {
+            $conn->prepare("
+                UPDATE rentals 
+                SET status = 'completed' 
+                WHERE id = ?
+            ")->execute([$rentalId]);
+        } else {
+            $conn->prepare("
+                UPDATE rentals 
+                SET status = 'returned' 
+                WHERE id = ?
+            ")->execute([$rentalId]);
+        }
+
         $conn->commit();
+        if ($owner->hasReceivedFeedbackFromRenter($rentalId)) {
+            $owner->updateRentalStatus($rentalId, 'completed');
+        } else {
+            $owner->updateRentalStatus($rentalId, 'returned');
+        }
+
         $_SESSION['success'] = "Feedback submitted successfully.";
         header("Location: view_rental.php?rental_id=$rentalId");
         exit();
@@ -113,6 +125,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
     }
 }
 
+if (!($rental = $owner->getRentalDetails($rentalId))) {
+    $_SESSION['error'] = "Rental not found.";
+    header('Location: rentals.php');
+    exit();
+}
+
+// Prepare proofs and status flow
 $currentStatus = $rental['status'];
 $proofsByType = [
     'handed_over_to_admin' => [],  
@@ -126,12 +145,21 @@ foreach ($owner->getProofs($rentalId) as $proof) {
         $proofsByType[$type][] = $proof;
     }
 }
-$statusFlow = $owner->getStatusFlow();
-$proofs = $owner->getProofs($rentalId);
+
+$statusFlow = [
+    'pending_confirmation' => 'Pending',
+    'approved' => 'Approved',
+    'ready_for_pickup' => 'Ready for Pickup',
+    'picked_up' => 'In Possession',
+    'returned' => 'Return Completed',
+    'completed' => 'Completed'
+];
+
 $remainingDays = $owner->calculateRemainingDays($rental['end_date'] ?? null);
 $hasOwnerReview = $owner->hasOwnerReview($rentalId);
 $csrfToken = $owner->generateCsrfToken();
 
+// Filter status flow based on current state
 if ($currentStatus === 'cancelled') {
     $filteredStatusFlow = ['cancelled' => 'Cancelled'];
 } else {
@@ -139,15 +167,8 @@ if ($currentStatus === 'cancelled') {
         return !in_array($key, ['cancelled', 'overdue']);
     }, ARRAY_FILTER_USE_KEY);
 }
-
-// In the progress container
-foreach ($filteredStatusFlow as $key => $label) {
-    $isActive = $owner->isStatusActive($key, $currentStatus, $filteredStatusFlow);
-    // Use $isActive in your HTML
-}
-
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

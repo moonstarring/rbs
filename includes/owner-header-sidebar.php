@@ -6,14 +6,21 @@ if (session_status() == PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../db/db.php';
 
-// Change 'user_id' to 'id' to match your login.php
 if (isset($_SESSION['id'])) {
     $userId = $_SESSION['id'];
     
     try {
-        // Check user details
+        // Get complete user data with verification status
         $query = "
-            SELECT users.name, users.role, users.profile_picture, user_verification.verification_status 
+            SELECT 
+                users.id,
+                users.first_name,
+                users.last_name,
+                users.email,
+                users.role,
+                users.profile_picture,
+                users.created_at,
+                COALESCE(user_verification.verification_status, 'pending') AS verification_status
             FROM users
             LEFT JOIN user_verification ON users.id = user_verification.user_id
             WHERE users.id = :user_id
@@ -23,31 +30,42 @@ if (isset($_SESSION['id'])) {
         $stmt->execute(['user_id' => $userId]);
         $user = $stmt->fetch();
         
-        if ($user && $user['verification_status'] === 'verified') {
-            $username = $user['name'];
-            $userRole = $user['role'];
+        if ($user) {
+            // Set profile data
+            $username = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+            $userRole = htmlspecialchars($user['role']);
+            $userEmail = htmlspecialchars($user['email']);
+            $joinDate = date('M Y', strtotime($user['created_at']));
             
-            // Check if profile picture exists and set path
-            if ($user['profile_picture'] && file_exists($_SERVER['DOCUMENT_ROOT'] . '/rb/' . $user['profile_picture'])) {
-                $profilePic = '/rb/' . $user['profile_picture']; // Correct path to image
-            } else {
-                $profilePic = '/rb/owner/includes/user.png'; // Default profile picture
+            // Handle profile picture path
+            $profilePic = '/owner/includes/user.png'; // Default
+            if (!empty($user['profile_picture'])) {
+                $correctedPath = (strpos($user['profile_picture'], '/') === 0) 
+                    ? $user['profile_picture'] 
+                    : '/' . $user['profile_picture'];
+                
+                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $correctedPath)) {
+                    $profilePic = $correctedPath;
+                }
             }
-        } else {
-            $username = 'Guest';
-            $userRole = 'renter';  // Default to renter if not verified
-            $profilePic = '/rb/owner/includes/user.png'; // Default profile picture
+            
+            // Set verification status
+            $verificationStatus = $user['verification_status'];
+            $verificationBadge = $verificationStatus === 'verified' 
+                ? '<i class="bi bi-patch-check-fill text-success"></i>' 
+                : '<i class="bi bi-x-circle-fill text-danger"></i>';
         }
+        
     } catch(PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         $username = 'Guest';
         $userRole = 'renter';
-        $profilePic = '/rb/owner/includes/user.png'; // Default profile picture in case of error
+        $profilePic = '/owner/includes/user.png'; // Default profile picture in case of error
     }
 } else {
     $username = 'Guest';
     $userRole = 'renter'; // Default if not logged in
-    $profilePic = '/rb/owner/includes/user.png'; // Default profile picture if not logged in
+    $profilePic = '/owner/includes/user.png'; // Default profile picture if not logged in
 }
 
 // Handle the "Become a Renter" button click
@@ -121,7 +139,7 @@ if (isset($_POST['become_renter'])) {
                         <i class="fas fa-bars"></i>
                     </button>
                     <!-- Logo -->
-                    <img src="/rb/owner/includes/logo.png" alt="RentBox Logo" class="logo" style="width: 50px; height: 50px; object-fit: contain;">
+                    <img src="/owner/includes/logo.png" alt="RentBox Logo" class="logo" style="width: 50px; height: 50px; object-fit: contain;">
                     <h4 class="m-0">RentBox</h4>
                 </div>
                 <div class="d-flex align-items-center">
@@ -148,7 +166,7 @@ if (isset($_POST['become_renter'])) {
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a href="/rb/owner/manage-account-owner.php" class="dropdown-item">Profile</a></li>
+                            <li><a href="/owner/profile.php" class="dropdown-item">Profile</a></li>
                             <li><a href="#" class="dropdown-item">Settings</a></li>
                             <li><a href="#" class="dropdown-item text-danger">Log Out</a></li>
                         </ul>
@@ -162,13 +180,13 @@ if (isset($_POST['become_renter'])) {
             <!-- Sidebar -->
             <div id="sidebar" class="sidebar">
                 <input type="text" class="form-control my-3" placeholder="Search">
-                <a href="/rb/owner/dashboard.php" id="dashboardLink"><i class="fas fa-tachometer-alt me-2 text-success"></i> Dashboard</a>
-                <a href="/rb/owner/gadget.php" id="gadgetLink"><i class="fas fa-tablet-alt me-2 text-success"></i> Gadgets</a>
-                <a href="/rb/owner/rentals.php" id="rentalsLink"><i class="fas fa-sync-alt me-2 text-success"></i> Rentals</a>
-                <a href="/rb/owner/all-reports.php" id="reportsLink"><i class="fas fa-file-alt me-2 text-success"></i> All reports</a>
-                <a href="/rb/owner/file_dispute.php" id="transactionsLink"><i class="fas fa-coins me-2 text-success"></i> File a Dispute </a>
-                <a href="/rb/owner/gadgets_assessment.php" id="assessmentLink"><i class="fas fa-file-alt me-2 text-success"></i> Assess Gadgets</a>
-                <a href="/rb/owner/logout.php" class="text-danger" id="logoutLink"><i class="fas fa-sign-out-alt me-2 text-success"></i> Log out</a>
+                <a href="/owner/dashboard.php" id="dashboardLink"><i class="fas fa-tachometer-alt me-2 text-success"></i> Dashboard</a>
+                <a href="/owner/gadget.php" id="gadgetLink"><i class="fas fa-tablet-alt me-2 text-success"></i> Gadgets</a>
+                <a href="/owner/rentals.php" id="rentalsLink"><i class="fas fa-sync-alt me-2 text-success"></i> Rentals</a>
+                <a href="/owner/all-reports.php" id="reportsLink"><i class="fas fa-file-alt me-2 text-success"></i> All reports</a>
+                <a href="/owner/file_dispute.php" id="transactionsLink"><i class="fas fa-coins me-2 text-success"></i> File a Dispute </a>
+                <a href="/owner/gadgets_assessment.php" id="assessmentLink"><i class="fas fa-file-alt me-2 text-success"></i> Assess Gadgets</a>
+                <a href="/owner/logout.php" class="text-danger" id="logoutLink"><i class="fas fa-sign-out-alt me-2 text-success"></i> Log out</a>
             </div>
         </div>
     </div>
