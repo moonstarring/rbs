@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 $servername = "localhost";  // Database host, typically 'localhost'
 $username = "root";         // Your database username
 $password = "";             // Your database password
-$dbname = "PROJECT";        // Your database name
+$dbname = "project";        // Your database name
 
 try {
     // Create a PDO instance to connect to the database

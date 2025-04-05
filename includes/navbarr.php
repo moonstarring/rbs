@@ -9,7 +9,7 @@ require_once __DIR__ . '/../db/db.php';
 // Change 'user_id' to 'id' to match your login.php
 if (isset($_SESSION['id'])) {
     $userId = $_SESSION['id'];
-    
+
     try {
         // Modified query to get user data
         $query = "
@@ -26,18 +26,18 @@ if (isset($_SESSION['id'])) {
         $stmt = $conn->prepare($query);
         $stmt->execute(['user_id' => $userId]);
         $user = $stmt->fetch();
-        
+
         if ($user) {
             $username = $user['name'];
             $userRole = $user['role'];
-            
+
             // Correct path handling
             $profilePic = '/owner/includes/user.png'; // Default image
             if (!empty($user['profile_picture'])) {
                 $correctedPath = (strpos($user['profile_picture'], '/') === 0)
-                    ? $user['profile_picture'] 
+                    ? $user['profile_picture']
                     : '/' . $user['profile_picture'];
-                
+
                 // Check file existence using document root
                 $fullPath = $_SERVER['DOCUMENT_ROOT'] . $correctedPath;
                 if (file_exists($fullPath)) {
@@ -50,7 +50,7 @@ if (isset($_SESSION['id'])) {
             $userRole = 'renter';
             $profilePic = '/owner/includes/user.png';
         }
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         $username = 'Guest';
         $userRole = 'renter';
@@ -84,77 +84,90 @@ if (isset($_POST['become_owner'])) {
             ";
             $updateStmt = $conn->prepare($updateQuery);
             $updateStmt->execute(['user_id' => $userId]);
-            
+
             $_SESSION['role'] = 'owner';
             header('Location: ../owner/dashboard.php');
             exit;
         } else {
             echo "<script>alert('Your verification is pending. Please complete the verification process to become an owner.');</script>";
         }
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         error_log("Database Error in becoming owner: " . $e->getMessage());
         echo "<script>alert('An error occurred. Please try again later.');</script>";
     }
 }
 ?>
 <!-- HTML for navbar with username dynamically displayed -->
-<div class="container bg-body rounded-bottom-5 d-flex mb-5 py-3 shadow">
-    <a href="browse.php">
-        <img class="ms-5 my-4" src="../images/rb logo text colored.png" alt="Logo" height="50px">
-    </a>
-    <div class="my-auto mx-auto d-flex gap-3">
-        <a href="browse.php" class="fs-5 text-decoration-none fw-bold active">Browse</a>
-        <a href="#" class="secondary fs-5 text-decoration-none fw-bold" id="toggleRoleButton" data-bs-toggle="modal" data-bs-target="#becomeOwnerModal">Become an Owner</a>
-    </div>
-    <div class="d-flex me-5 align-items-center gap-3">
-        <button type="button" class="success btn btn-outline-success rounded-circle"><i class="bi bi-search fs-5"></i></button>
-        <a href="../renter/cart.php">
-    <button type="button" class="success btn btn-outline-success rounded-circle">
-        <i class="bi bi-basket3 fs-5"></i>
-    </button>
-</a>
-
-
-
-        <!-- IF LOGGED IN  -->
-        <div class="dropdown-center">
-            <button type="button" class="success btn btn-outline-success rounded-circle m-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="true">
-                <img src="<?= htmlspecialchars($profilePic) ?>" class="object-fit-fill border rounded-circle" alt="pfp" style="width:50px; height: 50px;">
-            </button>
-            <ul class="dropdown-menu rounded-4">
-                <li>
-                    <p class="dropdown-item-text fw-bold m-0"><?= htmlspecialchars($username) ?></p>
+<nav class="navbar navbar-expand-lg mx-5 bg-body rounded-bottom-5 d-flex mb-5 py-3 shadow">
+    <div class="container-fluid d-flex justify-content-between mx-5">
+        <a href="browse.php" class="naxbar-brand me-auto">
+            <img class="my-4 me-5" src="../images/rb logo text colored.png" alt="Logo" height="50px">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+        </button>
+        <div class="collapse navbar-collapse gap-3" id="navbarToggler">
+            <ul class="navbar-nav me-auto mb-lg-0 container-fluid d-flex justify-content-between align-items-center">
+                <li class="nav-item">
+                    <div class="d-flex gap-4 align-items-center justify-content-center align-items-center mb-2">
+                        <a href="browse.php" class="fs-5 text-decoration-none fw-bold active d-none d-sm-block">Browse</a>
+                        <a href="#" class="secondary fs-5 text-decoration-none fw-bold d-none d-sm-block" id="toggleRoleButton" data-bs-toggle="modal" data-bs-target="#becomeOwnerModal">Become an Owner</a>
+                    </div>
                 </li>
-                <hr class="m-0 p-0">
-                <li class="my-1"><a class="dropdown-item" href="profile.php"><i class="bi bi-gear-fill me-2"></i>Profile</a></li>
-                <li class="my-1"><a class="dropdown-item" href="rentals.php"><i class="bi bi-box2-heart-fill me-2"></i>Rentals</a></li>
-                <hr class="m-0 p-0">
-                <li class="my-1"><a class="dropdown-item" href="supports.php"><i class="bi bi-headset me-2"></i>Supports</a></li>
-                <li class="my-1"><a class="dropdown-item" href="file_dispute.php"><i class="bi bi-file-earmark-x-fill me-2"></i>File Dispute</a></li>
-                <hr class="m-0 p-0">
-                <li class="my-1"><a class="dropdown-item" href="../includes/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Log out</a></li>
+                <li class="nav-item">
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="../renter/cart.php">
+                            <button type="button" class="success btn btn-outline-success rounded-circle">
+                                <i class="bi bi-basket3 fs-5"></i>
+                            </button>
+                        </a>
+
+
+
+                        <!-- IF LOGGED IN  -->
+                        <div class="dropdown-center">
+                            <button type="button" class="success btn btn-outline-success rounded-circle m-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="true">
+                                <img src="<?= htmlspecialchars($profilePic) ?>" class="object-fit-fill border rounded-circle" alt="pfp" style="width:50px; height: 50px;">
+                            </button>
+                            <ul class="dropdown-menu rounded-4">
+                                <li>
+                                    <p class="dropdown-item-text fw-bold m-0"><?= htmlspecialchars($username) ?></p>
+                                </li>
+                                <hr class="m-0 p-0">
+                                <li class="my-1"><a class="dropdown-item" href="profile.php"><i class="bi bi-gear-fill me-2"></i>Profile</a></li>
+                                <li class="my-1"><a class="dropdown-item" href="rentals.php"><i class="bi bi-box2-heart-fill me-2"></i>Rentals</a></li>
+                                <hr class="m-0 p-0">
+                                <li class="my-1"><a class="dropdown-item" href="supports.php"><i class="bi bi-headset me-2"></i>Supports</a></li>
+                                <li class="my-1"><a class="dropdown-item" href="file_dispute.php"><i class="bi bi-file-earmark-x-fill me-2"></i>File Dispute</a></li>
+                                <hr class="m-0 p-0">
+                                <li class="my-1"><a class="dropdown-item" href="../includes/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Log out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>
-</div>
 
+
+</nav>
 <!-- Modal for confirmation of switching to Owner mode -->
 <div class="modal fade" id="becomeOwnerModal" tabindex="-1" aria-labelledby="becomeOwnerModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="becomeOwnerModalLabel">Become an Owner</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to switch to Owner mode?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <form method="post" action="">
-            <button type="submit" name="become_owner" class="btn btn-primary">Switch to Owner</button>
-        </form>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="becomeOwnerModalLabel">Become an Owner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to switch to Owner mode?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="">
+                    <button type="submit" name="become_owner" class="btn btn-primary">Switch to Owner</button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
