@@ -85,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="bg-dark-subtle">
     <main class="container-fluid m-0 p-0">
-        <div class="container-fluid d-flex justify-content-center py-5" style="height: 100vh;">
-            <div class="card rounded-5 shadow" style="width:500px;">
+        <div class="container-fluid d-flex justify-content-center m-0 py-5" style="height: 100vh;">
+            <div class="card rounded-5 shadow my-5" style="width:500px;">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <a href="landing.php" class="text-center">
                         <img class="my-4" src="images/rb logo text colored.png" alt="Logo" height="50px">

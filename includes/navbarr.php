@@ -108,7 +108,7 @@ if (isset($_POST['become_owner'])) {
         </button>
         <div class="collapse navbar-collapse gap-3" id="navbarToggler">
             <ul class="navbar-nav me-auto mb-lg-0 container-fluid d-flex justify-content-between align-items-center">
-                <li class="nav-item">
+                <li class="nav-item mx-auto">
                     <div class="d-flex gap-4 align-items-center justify-content-center align-items-center mb-2">
                         <a href="browse.php" class="fs-5 text-decoration-none fw-bold active d-none d-sm-block">Browse</a>
                         <a href="#" class="secondary fs-5 text-decoration-none fw-bold d-none d-sm-block" id="toggleRoleButton" data-bs-toggle="modal" data-bs-target="#becomeOwnerModal">Become an Owner</a>

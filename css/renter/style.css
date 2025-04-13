@@ -2,8 +2,13 @@
     font-family: 'SF Pro Display', sans-serif;
 }
 
+.pagination {
+    position: relative;
+    z-index: 10; /* Ensure it's on top of other elements */
+}
+
 .image-bg{
-    background-image: url('../../images/background.png');
+    background-image: url('../../images/output.jpg');
     background-size: cover;
     background-position: center 70%;
     background-repeat: no-repeat;
@@ -12,8 +17,9 @@
 .rb{
     color: #1F4529;
 }
+
 .active{
-    color:#1F4529;
+    color: #1F4529;
 }
 .secondary{
     color: #9bc6a6;
@@ -21,6 +27,7 @@
 .secondary:hover{
     color:#1F4529;
 }
+
 .btn-success{
     color: white;
     border-color: #1F4529;
@@ -29,8 +36,8 @@
 
 .btn-success:hover{
     color: white;
-    border-color: #689457;
-    background-color: #689457;
+    border-color: #47663B;
+    background-color: #47663B;
 }
 
 .btn-success:focus, .btn-success.focus{
@@ -51,12 +58,17 @@
 .btn-success:focus, .btn-success.focus{
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
 }
-.gradient-success:hover{
-background: linear-gradient(90deg,#1f4529,#16301e,#0c1b11);
+.gradient-success{
+background: linear-gradient(0deg,#1f4529,#1f442a,#163220);
 background-size: 180% 180%;
-animation: gradient-animation 2s ease infinite;
-border: linear-gradient(90deg,#1f4529,#16301e,#0c1b11);
+color: white;
 }
+.gradient-success:hover{
+    background: linear-gradient(0deg,#1f4529,#1f442a,#163220);
+    background-size: 180% 180%;
+    animation: gradient-animation 2s ease infinite;
+    color: white;
+    }
 @keyframes gradient-animation {
     0% {
       background-position: 0% 50%;
@@ -69,7 +81,47 @@ border: linear-gradient(90deg,#1f4529,#16301e,#0c1b11);
     }
   }
 
-.pfp{
-    width: 90px;
-    height: 90px;
+  .card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.hover-effect {
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.hover-effect:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.no-products {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+    padding: 20px;
+}
+
+.toast {
+    min-width: 350px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease-in-out;
+}
+
+.toast-header {
+    padding: 0.75rem 1rem;
+    border-bottom: none;
+}
+
+.toast-body {
+    padding: 1rem;
+    font-weight: 500;
+}
+
+.progress {
+    border-radius: 0 0 0.375rem 0.375rem;
+    overflow: hidden;
 }
