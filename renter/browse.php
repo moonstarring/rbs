@@ -150,7 +150,7 @@ function shortenText($text, $maxLength = 20)
                     </div>
                 <?php endforeach; ?>
             </div> -->
-            <div class="container-fluid m-0 p-0 p-md-4">
+            <div class="container-fluid m-0 p-0 p-md-4 mt-md-2 ">
                 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-1 g-sm-0 g-md-3 g-lg-4">
                     <?php foreach ($formattedProducts as $product): ?>
                         <div class="col p-0 mt-md-0">
