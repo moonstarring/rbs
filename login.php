@@ -76,52 +76,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rentbox</title>
     <link rel="icon" type="image/png" href="images/rb logo white.png">
     <link href="vendor/bootstrap-5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="vendor/font/bootstrap-icons.css">
 </head>
 
-<body class="bg-dark-subtle">
-    <main class="container-fluid m-0 p-0">
-        <div class="container-fluid d-flex justify-content-center m-0 py-5" style="height: 100vh;">
-            <div class="card rounded-5 shadow my-5" style="width:500px;">
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <a href="landing.php" class="text-center">
-                        <img class="my-4" src="images/rb logo text colored.png" alt="Logo" height="50px">
-                    </a>
-                    <h5 class="text-center mt-4 mb-4 fw-bold">Login</h5>
+<body class="">
+    <div class="container-fluid p-0 m-0 bg-dark-subtle">
+        <div class="row d-flex justify-content-center align-items-center m-0 p-lg-5 vh-100">
+            <div class="col-md-7 col-lg-5 col-sm-10 col-xs-10">
+                <div class="card rounded-5 shadow">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <a href="landing.php" class="text-center">
+                            <img class="my-4" src="images/rb logo text colored.png" alt="Logo" height="50px">
+                        </a>
+                        <h5 class="text-center mt-4 mb-4 fw-bold">Login</h5>
 
-                    <!-- Display error message if credentials are incorrect or account pending -->
-                    <?php if ($errorMessage): ?>
-                        <div class="alert alert-sm alert-danger text-center py-2 px-auto"><small><?php echo htmlspecialchars($errorMessage); ?></small></div>
-                    <?php endif; ?>
+                        <!-- Display error message if credentials are incorrect or account pending -->
+                        <?php if ($errorMessage): ?>
+                            <div class="alert alert-sm alert-danger text-center py-2 px-auto"><small><?php echo htmlspecialchars($errorMessage); ?></small></div>
+                        <?php endif; ?>
 
-                    <form method="POST" action="" class="mx-5">
-                        <div class="form-floating mb-3" style="font-size: 14px;">
-                            <input type="email" name="email" class="form-control ps-4 rounded-5" id="floatingInput" placeholder="Email" required value="<?= htmlspecialchars($email) ?>">
-                            <label for="floatingInput" class="ps-4">Email</label>
-                        </div>
+                        <form method="POST" action="" class="mx-lg-5 mx-md-4">
+                            <div class="form-floating mb-3" style="font-size: 14px;">
+                                <input type="email" name="email" class="form-control ps-4 rounded-5" id="floatingInput" placeholder="Email" required value="<?= htmlspecialchars($email) ?>">
+                                <label for="floatingInput" class="ps-4">Email</label>
+                            </div>
 
-                        <div class="form-floating mb-3" style="font-size: 14px;">
-                            <input type="password" name="password" class="form-control ps-4 rounded-5" id="floatingPassword" placeholder="Password" required>
-                            <label for="floatingPassword" class="ps-4">Password</label>
-                        </div>
+                            <div class="form-floating mb-3" style="font-size: 14px;">
+                                <input type="password" name="password" class="form-control ps-4 rounded-5" id="floatingPassword" placeholder="Password" required>
+                                <label for="floatingPassword" class="ps-4">Password</label>
+                            </div>
 
-                        <div class="d-flex mb-4 justify-content-between">
-                            <a class="link-secondary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-50-hover" href="signup.php" style="font-size: 12px;">Create an account</a>
-                            <a class="link-secondary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-50-hover" href="forgot-password.php" style="font-size: 12px;">Forgot Password?</a>
-                        </div>
+                            <div class="d-flex mb-4 justify-content-between">
+                                <a class="link-secondary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-50-hover" href="signup.php" style="font-size: 12px;">Create an account</a>
+                                <a class="link-secondary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-50-hover" href="forgot-password.php" style="font-size: 12px;">Forgot Password?</a>
+                            </div>
 
-                        <div class="d-flex justify-content-center mb-4">
-                            <button type="submit" class="btn btn-success rounded-5 shadow w-50">Login</button>
-                        </div>
-                    </form>
+                            <div class="d-flex justify-content-center mb-4">
+                                <button type="submit" class="btn btn-success rounded-5 shadow w-50">Login</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+
 
     <footer class="px-3 bg-body d-none d-md-block">
         <div class="d-flex flex-column flex-sm-row justify-content-between py-2 border-top">

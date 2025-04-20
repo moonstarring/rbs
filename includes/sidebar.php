@@ -19,51 +19,49 @@ require_once __DIR__ . '/../db/db.php';
 </style>
 
 <!-- sidebar.php -->
-<div class="row container-fluid p-3 m-0 bg-body">
-    <div class="d-flex"> <!--left align for now -->
-        <p class="fs-6 fw-bold">Categories</p>
-
-        <div class="d-flex m-0">
-            <div class="dropdown">
-                <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0 dropdown-toggle" type="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-gift me-1"></i>All Gadgets
-                </button>
-                <ul class="dropdown-menu m-0 p-0">
-                    <?php
-                    $categories = [
-                        'Mobile Phones',
-                        'Laptops',
-                        'Tablets',
-                        'Cameras',
-                        'Accessories',
-                        'Gaming Consoles',
-                        'Audio Devices',
-                        'Drones'
-                    ];
-                    foreach ($categories as $category) {
-                        echo '<input type="checkbox" class="btn-check" 
+<div class="container-fluid p-3 m-0 px-lg-5 bg-body">
+    <p class="fs-6 fw-bold">Categories</p>
+    <div class="d-flex">
+        <div class="dropdown">
+            <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0 dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gift me-1"></i>All Gadgets
+            </button>
+            <ul class="dropdown-menu m-0 p-0">
+                <?php
+                $categories = [
+                    'Mobile Phones',
+                    'Laptops',
+                    'Tablets',
+                    'Cameras',
+                    'Accessories',
+                    'Gaming Consoles',
+                    'Audio Devices',
+                    'Drones'
+                ];
+                foreach ($categories as $category) {
+                    echo '<input type="checkbox" class="btn-check" 
                                    id="btn-check-' . $category . '" autocomplete="off" 
                                    onclick="filterCategory(\'' . $category . '\')">';
-                        echo '<li><label class="d-flex btn btn-outline-secondary border-0 mb-1" 
+                    echo '<li><label class="d-flex btn btn-outline-secondary border-0 mb-1" 
                                    for="btn-check-' . $category . '">' . $category . '</label></li';
-                    }
-                    ?>
-                </ul>
-            </div>
-
-            <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0"
-                data-sort="newest"
-                onclick="updateSort('newest')">
-                <i class="bi bi-bag me-1"></i>Newly Posted
-            </button>
-            <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0"
-                data-sort="top_rated"
-                onclick="updateSort('top_rated')">
-                <i class="bi bi-stars me-1"></i>Top Ratings
-            </button>
+                }
+                ?>
+            </ul>
         </div>
+
+        <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0"
+            data-sort="newest"
+            onclick="updateSort('newest')">
+            <i class="bi bi-bag me-1"></i>Newly Posted
+        </button>
+        <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0"
+            data-sort="top_rated"
+            onclick="updateSort('top_rated')">
+            <i class="bi bi-stars me-1"></i>Top Ratings
+        </button>
     </div>
+
 </div>
 
 <script>

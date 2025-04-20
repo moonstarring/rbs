@@ -97,11 +97,11 @@ function shortenText($text, $maxLength = 20)
         <!-- Include Navbar -->
         <?php include '../includes/navbarr.php'; ?>
 
-        <div class="container bg-body rounded-top-5 d-flex">
+        <div class="bg-body rounded-top-5 d-flex">
             <div class="mx-5 my-4 container-fluid d-flex justify-content-between align-items-center">
                 <p class="fs-4 fw-bolder my-auto rb d-none d-sm-block">Rent Gadgets, Your Way</p>
                 <form class="d-flex gap-3 my-lg-0" method="GET" action="">
-                    <input class="form-control rounded-5 px-3 shadow-sm"
+                    <input class="form-control rounded-5 px-3 shadow-sm ms-auto"
                         type="text"
                         placeholder="Type to search..."
                         id="searchInput"
@@ -150,35 +150,36 @@ function shortenText($text, $maxLength = 20)
                     </div>
                 <?php endforeach; ?>
             </div> -->
-            <div class="container-fluid">
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 m-0 p-0">
+            <div class="container-fluid m-0 p-0 p-md-4">
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-1 g-sm-0 g-md-3 g-lg-4">
                     <?php foreach ($formattedProducts as $product): ?>
-                        <div class="col">
-                            <div class="card h-100 hover-effect shadow-sm">
+                        <div class="col p-0 mt-md-0">
+                            <div class="card card-height hover-effect shadow-sm m-1">
                                 <a href="item.php?id=<?php echo $product['id']; ?>" class="text-decoration-none text-dark">
                                     <img src="../img/uploads/<?php echo $product['image']; ?>"
                                         alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                        class="card-img-top object-fit-cover" style="height: 200px;">
-                                    <div class="card-body d-flex flex-column">
-                                        <h5 class="card-title fs-6 fw-bold"><?php echo shortenText($product['name']); ?></h5> <!-- Reduced font size for smaller devices -->
-                                        <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                            <small class="text-muted">
-                                                <i class="bi bi-star-fill text-warning me-1"></i>
-                                                <?php echo $product['average_rating']; ?> (<?php echo $product['rating_count']; ?>)
-                                            </small>
-                                            <p class="mb-0">₱<?php echo $product['rental_price']; ?><small class="text-muted">/day</small></p>
-                                        </div>
-                                        <div class="mt-auto"> <!-- Push buttons to the bottom -->
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <form action="add_to_cart.php" method="POST" class="d-inline">
-                                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                                                    <input type="hidden" name="page" value="<?php echo htmlspecialchars($_GET['page'] ?? 1); ?>">
-                                                    <button type="submit" class="btn btn-outline-dark btn-sm rounded-5 shadow-sm">Add to Cart
-                                                    </button>
-                                                </form>
-                                                <a href="/rb/renter/item.php?id=<?= $product['id'] ?>" class="btn btn-sm rounded-pill gradient-success">Rent Now</a>
+                                        class="card-img-top object-fit-cover border" style="height: 200px;">
+
+                                    <div class="card-body d-flex flex-column m-0 p-2 p-md-3">
+                                        <h6 class="card-title fs-6 fw-bold m-0"><?php echo shortenText($product['name']); ?></h6>
+
+                                        <div class="mt-auto justify-content-between align-items-center mb-1"> <!-- Push buttons to the bottom -->
+                                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-star-fill text-warning me-1"></i>
+                                                    <?php echo $product['average_rating']; ?> (<?php echo $product['rating_count']; ?>)
+                                                </small>
+                                                <p class="mb-0">₱<?php echo $product['rental_price']; ?><small class="text-muted">/day</small></p>
                                             </div>
+                                            
+                                            <form action="add_to_cart.php" method="POST" class="d-inline">
+                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                <input type="hidden" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                                                <input type="hidden" name="page" value="<?php echo htmlspecialchars($_GET['page'] ?? 1); ?>">
+                                                <a type="submit" class="btn btn-outline-dark btn-sm rounded-5 shadow-sm">Add to Cart
+                                                </a>
+                                            </form>
+                                            <a href="/rb/renter/item.php?id=<?= $product['id'] ?>" class="btn btn-sm rounded-pill gradient-success">Rent Now</a>
                                         </div>
                                     </div>
                                 </a>
@@ -261,6 +262,17 @@ function shortenText($text, $maxLength = 20)
 
     <script src="../vendor/bootstrap-5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+
+            searchInput.addEventListener('focus', function() {
+                searchInput.classList.add('expanded-input');
+            });
+
+            searchInput.addEventListener('blur', function() {
+                searchInput.classList.remove('expanded-input');
+            });
+        });
         // Toast Notification System
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
