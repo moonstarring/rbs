@@ -133,6 +133,15 @@ if (isset($_POST['become_owner'])) {
 
 
 </nav>-->
+<style>
+    .image-bg {
+        background-image: url('../IMG_5129.JPG');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+    }
+</style>
 <nav class="navbar navbar-expand-lg bg-body rounded-bottom-5 shadow mx-3 mx-md-5 mx-md-lg mb-5 px-3 p-md-4 p-lg-4">
     <div class="container-fluid">
         <a class="navbar-brand active fw-bolder fs-4 fs-sm-6" href="browse.php">
@@ -152,7 +161,7 @@ if (isset($_POST['become_owner'])) {
                             <i class="bi bi-basket3 fs-5"></i>
                         </button>
                     </a>
-                    
+
                     <!-- IF LOGGED IN   -->
                     <div class="dropstart my-auto">
                         <button type="button" class="success btn btn-outline-success rounded-circle m-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -200,23 +209,23 @@ if (isset($_POST['become_owner'])) {
 </div>
 
 <nav class="navbar navbar-dark bg-dark fixed-bottom d-md-none">
-  <div class="container">
-    <div class="d-flex justify-content-around align-items-center w-100">
-      <a class="navbar-brand" href="#">
-        <i class="bi bi-house-fill"></i>
-      </a>
-      <a class="navbar-brand" href="#">
-        <i class="bi bi-search"></i>
-      </a>
-      <a class="navbar-brand" href="#">
-        <i class="bi bi-plus-circle-fill"></i>
-      </a>
-      <a class="navbar-brand" href="#">
-        <i class="bi bi-heart-fill"></i>
-      </a>
-      <a class="navbar-brand" href="#">
-        <i class="bi bi-person-circle"></i>
-      </a>
+    <div class="container">
+        <div class="d-flex justify-content-around align-items-center w-100">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-house-fill"></i>
+            </a>
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-search"></i>
+            </a>
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-plus-circle-fill"></i>
+            </a>
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-heart-fill"></i>
+            </a>
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-person-circle"></i>
+            </a>
+        </div>
     </div>
-  </div>
 </nav>

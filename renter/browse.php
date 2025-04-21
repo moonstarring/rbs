@@ -69,7 +69,13 @@ function shortenText($text, $maxLength = 20)
     <link rel="stylesheet" href="../vendor/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../css/renter/browse_style.css">
     <style>
-
+        .image-bg {
+            background-image: url('../IMG_5129.JPG');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
     </style>
 </head>
 
@@ -171,7 +177,7 @@ function shortenText($text, $maxLength = 20)
                                                 </small>
                                                 <p class="mb-0">₱<?php echo $product['rental_price']; ?><small class="text-muted">/day</small></p>
                                             </div>
-                                            
+
                                             <div class="d-flex justify-content-between align-items-baseline mb-1">
                                                 <form action="add_to_cart.php" method="POST" class="d-inline">
                                                     <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">

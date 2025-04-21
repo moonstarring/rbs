@@ -65,6 +65,15 @@ $productData = [
     <link rel="stylesheet" href="../vendor/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../css/renter/style.css">
     <link rel="stylesheet" href="../vendor/flatpickr.min.css">
+    <style>
+        .image-bg {
+            background-image: url('../IMG_5129.JPG');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+    </style>
 </head>
 
 <body>

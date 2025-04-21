@@ -7,13 +7,6 @@
     z-index: 10; /* Ensure it's on top of other elements */
 }
 
-.image-bg{
-    background-image: url('../../images/output.jpg');
-    background-size: cover;
-    background-position: center 70%;
-    background-repeat: no-repeat;
-    height: 100vh;
-}
 .rb{
     color: #1F4529;
 }
@@ -171,16 +164,32 @@ color: white;
 .smol{
     font-family: 'SF Pro Display', sans-serif;
     }
-        @media (max-width: 575.98px) {
-        .smol{
-        font-size: 12px;
-        }
-    
-        @media (min-width: 576px) and (max-width: 767.98px) {
-        .smol {
-        font-size: 12px;
-        }
-        }
+  @media (max-width: 575.98px) {
+  .smol{
+  font-size: 12px;
+  }
+
+  @media (min-width: 576px) and (max-width: 767.98px) {
+  .smol {
+  font-size: 12px;
+  }
+  }
+}
+
+.cart-img{
+  width: 240px; 
+  height: 240px;
+}
+@media (max-width: 575.98px) {
+  .cart-img{
+  width: 150px; 
+  height: 150px;
+  }
+  @media (min-width: 576px) and (max-width: 767.98px) {
+    .cart-img {
+    width: 150px; 
+    height: 150px;
     }
-    
+  }
+}
     
