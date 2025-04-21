@@ -198,3 +198,25 @@ if (isset($_POST['become_owner'])) {
         </div>
     </div>
 </div>
+
+<nav class="navbar navbar-dark bg-dark fixed-bottom d-md-none">
+  <div class="container">
+    <div class="d-flex justify-content-around align-items-center w-100">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-house-fill"></i>
+      </a>
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-search"></i>
+      </a>
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-plus-circle-fill"></i>
+      </a>
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-heart-fill"></i>
+      </a>
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-person-circle"></i>
+      </a>
+    </div>
+  </div>
+</nav>

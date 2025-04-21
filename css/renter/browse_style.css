@@ -156,8 +156,7 @@ color: white;
   
   @media (max-width: 575.98px) {
     .card-height{
-    height: 310px;  /*  Smaller width on extra small screens */
-    font-size: 12px;
+    height: 310px;
     }
   
   
@@ -165,7 +164,23 @@ color: white;
   @media (min-width: 576px) and (max-width: 767.98px) {
     .card-height {
     height: 310px; 
-    font-size: 12px;
     }
   }
 }
+
+.smol{
+    font-family: 'SF Pro Display', sans-serif;
+    }
+        @media (max-width: 575.98px) {
+        .smol{
+        font-size: 12px;
+        }
+    
+        @media (min-width: 576px) and (max-width: 767.98px) {
+        .smol {
+        font-size: 12px;
+        }
+        }
+    }
+    
+    

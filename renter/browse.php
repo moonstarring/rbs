@@ -150,7 +150,7 @@ function shortenText($text, $maxLength = 20)
                     </div>
                 <?php endforeach; ?>
             </div> -->
-            <div class="container-fluid m-0 p-0 p-md-4 mt-md-2 ">
+            <div class="container-fluid m-0 p-0 p-md-4 mt-md-2 smol">
                 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-1 g-sm-0 g-md-3 g-lg-4">
                     <?php foreach ($formattedProducts as $product): ?>
                         <div class="col p-0 mt-md-0">
@@ -172,14 +172,16 @@ function shortenText($text, $maxLength = 20)
                                                 <p class="mb-0">₱<?php echo $product['rental_price']; ?><small class="text-muted">/day</small></p>
                                             </div>
                                             
-                                            <form action="add_to_cart.php" method="POST" class="d-inline">
-                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                                <input type="hidden" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                                                <input type="hidden" name="page" value="<?php echo htmlspecialchars($_GET['page'] ?? 1); ?>">
-                                                <a type="submit" class="btn btn-outline-dark btn-sm rounded-5 shadow-sm">Add to Cart
-                                                </a>
-                                            </form>
-                                            <a href="/rb/renter/item.php?id=<?= $product['id'] ?>" class="btn btn-sm rounded-pill gradient-success">Rent Now</a>
+                                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                                <form action="add_to_cart.php" method="POST" class="d-inline">
+                                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                                                    <input type="hidden" name="page" value="<?php echo htmlspecialchars($_GET['page'] ?? 1); ?>">
+                                                    <a type="submit" class="btn btn-outline-dark btn-sm rounded-5 shadow-sm smol">Add to Cart
+                                                    </a>
+                                                </form>
+                                                <a href="/rb/renter/item.php?id=<?= $product['id'] ?>" class="btn btn-sm rounded-pill gradient-success smol">Rent Now</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </a>

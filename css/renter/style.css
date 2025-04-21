@@ -125,3 +125,33 @@ color: white;
     border-radius: 0 0 0.375rem 0.375rem;
     overflow: hidden;
 }
+
+.smol{
+font-family: 'SF Pro Display', sans-serif;
+}
+    @media (max-width: 575.98px) {
+    .smol{
+    font-size: 11px;
+    }
+
+    @media (min-width: 576px) and (max-width: 767.98px) {
+    .smol {
+    font-size: 11px;
+    }
+    }
+}
+.smol-btn{
+    font-family: 'SF Pro Display', sans-serif;
+    }
+        @media (max-width: 575.98px) {
+        .smol-btn{
+        font-size: 14px;
+        }
+    
+        @media (min-width: 576px) and (max-width: 767.98px) {
+        .smol-btn {
+        font-size: 14px;
+        }
+        }
+    }
+
