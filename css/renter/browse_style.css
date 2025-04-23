@@ -162,7 +162,7 @@ color: white;
 }
 
 .smol{
-    font-family: 'SF Pro Display', sans-serif;
+    font-size: 16px;
     }
   @media (max-width: 575.98px) {
   .smol{
@@ -174,6 +174,36 @@ color: white;
   font-size: 12px;
   }
   }
+}
+
+.smoll{
+  font-size: 16px;
+  }
+@media (max-width: 575.98px) {
+.smoll{
+font-size: 14px;
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+.smoll{
+font-size: 14px;
+}
+}
+}
+
+.smolll{
+  font-size: 14px;
+  }
+@media (max-width: 575.98px) {
+.smolll{
+font-size: 11px;
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+.smolll{
+font-size: 11px;
+}
+}
 }
 
 .cart-img{

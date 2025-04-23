@@ -142,7 +142,7 @@ if (isset($_POST['become_owner'])) {
         height: 100vh;
     }
 </style>
-<nav class="navbar navbar-expand-lg bg-body rounded-bottom-5 shadow mx-3 mx-md-5 mx-md-lg mb-5 px-3 p-md-4 p-lg-4">
+<nav class="navbar navbar-expand-lg bg-body rounded-bottom-5 shadow mx-3 mx-md-5 mx-md-lg mb-5 px-3 p-md-4 p-lg-4 d-none d-md-block d-lg-block">
     <div class="container-fluid">
         <a class="navbar-brand active fw-bolder fs-4 fs-sm-6" href="browse.php">
             <img class="" src="../images/rb logo colored.png" alt="Logo" height="50px">
@@ -155,7 +155,8 @@ if (isset($_POST['become_owner'])) {
                 <a class="nav-link link-success my-auto mx-auto fw-bold" href="" id="toggleRoleButton" data-bs-toggle="modal" data-bs-target="#becomeOwnerModal">Become an Owner</a>
                 <!-- <a class="nav-link my-auto" href="">Sign Up</a> -->
                 <!-- <a class="nav-link my-auto" href="">Log In</a> -->
-                <div class="nav-link d-flex mx-auto">
+                <div class="nav-link mx-auto d-none d-md-flex d-lg-flex">
+                    <!-- di na to lalabas sa smol -->
                     <a class="me-5 me-md-3" href="../renter/cart.php">
                         <button type="button" class="success btn btn-outline-success rounded-circle">
                             <i class="bi bi-basket3 fs-5"></i>
@@ -208,24 +209,9 @@ if (isset($_POST['become_owner'])) {
     </div>
 </div>
 
-<nav class="navbar navbar-dark bg-dark fixed-bottom d-md-none">
-    <div class="container">
-        <div class="d-flex justify-content-around align-items-center w-100">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-house-fill"></i>
-            </a>
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-search"></i>
-            </a>
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-plus-circle-fill"></i>
-            </a>
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-heart-fill"></i>
-            </a>
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-person-circle"></i>
-            </a>
-        </div>
-    </div>
+<nav class="navbar d-md-none d-lg-none py-3">
+    <a class="navbar-brand text-white fw-bolder fs-4 fs-sm-6 mx-auto" href="browse.php">
+        <img class="" src="../images/rb logo white.png" alt="Logo" height="50px">
+        Rentbox</a>
 </nav>
+

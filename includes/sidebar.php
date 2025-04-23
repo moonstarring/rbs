@@ -23,7 +23,7 @@ require_once __DIR__ . '/../db/db.php';
     <p class="fs-6 fw-bold">Categories</p>
     <div class="d-flex">
         <div class="dropdown">
-            <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0 dropdown-toggle" type="button"
+            <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0 dropdown-toggle smoll" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-gift me-1"></i>All Gadgets
             </button>
@@ -43,19 +43,19 @@ require_once __DIR__ . '/../db/db.php';
                     echo '<input type="checkbox" class="btn-check" 
                                    id="btn-check-' . $category . '" autocomplete="off" 
                                    onclick="filterCategory(\'' . $category . '\')">';
-                    echo '<li><label class="d-flex btn btn-outline-secondary border-0 mb-1" 
+                    echo '<li><label class="d-flex btn btn-outline-secondary border-0 mb-1 smoll" 
                                    for="btn-check-' . $category . '">' . $category . '</label></li';
                 }
                 ?>
             </ul>
         </div>
 
-        <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0"
+        <button class="btn btn-outline-success smoll fw-bold mb-2 ms-2 border-0"
             data-sort="newest"
             onclick="updateSort('newest')">
             <i class="bi bi-bag me-1"></i>Newly Posted
         </button>
-        <button class="btn btn-outline-success fs-6 fw-bold mb-2 ms-2 border-0"
+        <button class="btn btn-outline-success smoll fw-bold mb-2 ms-2 border-0"
             data-sort="top_rated"
             onclick="updateSort('top_rated')">
             <i class="bi bi-stars me-1"></i>Top Ratings
