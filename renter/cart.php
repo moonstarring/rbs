@@ -116,27 +116,24 @@ $allAvailable = $cartData['allAvailable'];
                     <hr class="px-2 mt-2">
                 </div>
                 <!-- mobile-only functions -->
-                <nav class="navbar bg-secondary-subtle fixed-bottom d-md-none d-lg-none">
-                    <div class="container">
-                        <div class="d-flex justify-content-around align-items-center w-100">
-                            <a class="navbar-brand" href="browse.php">
-                                <i class="bi bi-house-fill rb"></i>
-                            </a>
-                            <a class="navbar-brand" href="../renter/cart.php">
-                                <i class="bi bi-basket3-fill text-success"></i>
-                            </a>
-                            <a class="m-0 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
-                                <i class="bi bi-person-circle rb m-0 p-0" style="font-size: 20px;"></i>
-                            </a>
-                        </div>
-                    </div>
+                <nav class="navbar bg-secondary-subtle fixed-bottom d-flex d-md-none d-lg-none align-items-baseline">
+                    <h5 class="fs-6 py-2 rounded text-success text-center ms-3">Subtotal</h5>
+                    <h4 class="fw-bold ms-auto me-3">₱<?php echo number_format($subtotal); ?></h4>
+
+                    <?php if ($allAvailable): ?>
+                        <a class="btn btn-success btn-sm px-3 rounded d-flex justify-content-center align-items-center mt-3 me-3" href="checkout.php" type="button">
+                            <i class="bi bi-credit-card fs-6 pe-2"></i>Checkout
+                        </a>
+                    <?php else: ?>
+                        <small class="text-danger mt-2">One or more items are unavailable for checkout.</small>
+                    <?php endif; ?>
                 </nav>
 
                 <!-- Other functions wrapper -->
-                <div class="col-3 order-last d-none d-md-flex d-lg-flex">
+                <div class="col-3 order-last d-none d-md-block d-lg-block">
                     <!-- Total -->
                     <div class="d-flex flex-column justify-content-center ">
-                        <h5 class="h6 py-2 rounded bg-body-secondary text-success text-center">Subtotal</h5>
+                        <h5 class="h6 py-2 rounded bg-secondary-subtle text-success text-center">Subtotal</h5>
                         <h4 class="fw-bold text-center pt-3 pb-1">₱<?php echo number_format($subtotal, 2); ?></h4>
 
                         <hr class="mx-2 p-0">

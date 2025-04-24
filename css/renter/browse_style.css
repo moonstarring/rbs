@@ -200,21 +200,6 @@ font-size: 11px;
 }
 }
 
-.smollll{
-  font-size: 15px;
-  }
-@media (max-width: 575.98px) {
-.smollll{
-font-size: 10px;
-}
-
-@media (min-width: 576px){
-.smollll{
-font-size: 10px;
-}
-}
-}
-
 .cart-img{
   width: 240px; 
   height: 240px;
