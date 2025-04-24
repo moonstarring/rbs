@@ -39,11 +39,18 @@
     color: #1F4529;
     background: linear-gradient(45deg,#c0d3c5,#3d8655,#1c5731);
     background-size: 180% 180%;
-    animation: gradient-animation 2s ease infinite;
+    animation: gradient-animation 5s ease infinite;
     color: white;
     border: 0px;
 }
-
+.btn-success3{
+    color: #1F4529;
+    background: linear-gradient(-45deg,#c0d3c5,#3d8655,#1c5731);
+    background-size: 180% 180%;
+    animation: gradient-animation 5s ease infinite;
+    color: white;
+    border: 0px;
+}
 .btn-outline-success {
     color: #1F4529;
     border-color: #1F4529;
@@ -59,16 +66,10 @@
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
 }
 .gradient-success{
-background: linear-gradient(0deg,#1f4529,#1f442a,#163220);
-background-size: 180% 180%;
-color: white;
+background: linear-gradient(0deg,#e1e1e1,#e1e1e1,#1f442a,#1f442a);
+background-size: 100% 100%;
+animation: gradient-animation 5s ease infinite;
 }
-.gradient-success:hover{
-    background: linear-gradient(0deg,#1f4529,#1f442a,#163220);
-    background-size: 180% 180%;
-    animation: gradient-animation 2s ease infinite;
-    color: white;
-    }
 @keyframes gradient-animation {
     0% {
       background-position: 0% 50%;
