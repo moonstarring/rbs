@@ -73,12 +73,6 @@ color: white;
     }
   }
 
-  .card:hover {
-    transform: scale(1.01);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
 .hover-effect {
     transition: transform 0.3s ease;
     position: relative;
@@ -184,7 +178,7 @@ color: white;
 font-size: 14px;
 }
 
-@media (min-width: 576px) and (max-width: 767.98px) {
+@media (min-width: 576px){
 .smoll{
 font-size: 14px;
 }
@@ -199,9 +193,24 @@ font-size: 14px;
 font-size: 11px;
 }
 
-@media (min-width: 576px) and (max-width: 767.98px) {
+@media (min-width: 576px){
 .smolll{
 font-size: 11px;
+}
+}
+}
+
+.smollll{
+  font-size: 15px;
+  }
+@media (max-width: 575.98px) {
+.smollll{
+font-size: 10px;
+}
+
+@media (min-width: 576px){
+.smollll{
+font-size: 10px;
 }
 }
 }
@@ -210,7 +219,7 @@ font-size: 11px;
   width: 240px; 
   height: 240px;
 }
-@media (max-width: 575.98px) {
+  @media (max-width: 575.98px) {
   .cart-img{
   width: 150px; 
   height: 150px;
@@ -222,4 +231,20 @@ font-size: 11px;
     }
   }
 }
-    
+  
+.rent-img{
+  width: 240px; 
+  height: 240px;
+}
+  @media (max-width: 575.98px) {
+  .rent-img{
+  width: 100px; 
+  height: 100px;
+  }
+  @media (min-width: 576px) and (max-width: 767.98px) {
+    .rent-img {
+    width: 100px; 
+    height: 100px;
+    }
+  }
+}

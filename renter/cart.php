@@ -30,6 +30,15 @@ $allAvailable = $cartData['allAvailable'];
     <link rel="stylesheet" href="../vendor/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../vendor/flatpickr.min.css">
     <link rel="stylesheet" href="../css/renter/browse_style.css">
+    <style>
+        .image-bg {
+            background-image: url('../IMG_5129.JPG');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+    </style>
 </head>
 
 <body>
@@ -41,7 +50,7 @@ $allAvailable = $cartData['allAvailable'];
                 <!-- Items wrapper -->
                 <div class="col-12 col-md-9 col-lg-9 order-first p-0">
                     <!-- Title -->
-                    <div class="rounded-3 d-flex bg-body-secondary justify-content-between align-items-center mb-3 px-2 px-md-0 px-lg-0">
+                    <div class="rounded-3 d-flex bg-secondary-subtle justify-content-between align-items-center mb-3 px-2 px-md-0 px-lg-0">
                         <h5 class="m-0 p-0 text-success ps-md-3">Your Cart</h5>
                         <a href="browse.php" class="d-flex btn btn-outline-light align-items-center border-0 rounded-start-0">
                             <i class="bi bi-caret-left-fill text-success pe-2 fs-6"></i>
@@ -107,19 +116,20 @@ $allAvailable = $cartData['allAvailable'];
                     <hr class="px-2 mt-2">
                 </div>
                 <!-- mobile-only functions -->
-                <nav class="navbar bg-light-subtle fixed-bottom d-flex align-items-baseline d-md-none d-lg-none px-3 py-4">
-
-                    <h5 class="smoll text-success">Subtotal</h5>
-                    <h4 class="fw-bold bg-light-subtle ms-auto me-2">₱<?php echo number_format($subtotal, 0); ?></h4>
-
-                    <?php if ($allAvailable): ?>
-                        <a class="btn btn-success rounded d-flex align-items-center gap-2" href="checkout.php" type="button">
-                            <i class="bi bi-credit-card"></i>
-                            Checkout
-                        </a>
-                    <?php else: ?>
-                        <small class="text-danger mt-2">One or more items are unavailable for checkout.</small>
-                    <?php endif; ?>
+                <nav class="navbar bg-secondary-subtle fixed-bottom d-md-none d-lg-none">
+                    <div class="container">
+                        <div class="d-flex justify-content-around align-items-center w-100">
+                            <a class="navbar-brand" href="browse.php">
+                                <i class="bi bi-house-fill rb"></i>
+                            </a>
+                            <a class="navbar-brand" href="../renter/cart.php">
+                                <i class="bi bi-basket3-fill text-success"></i>
+                            </a>
+                            <a class="m-0 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+                                <i class="bi bi-person-circle rb m-0 p-0" style="font-size: 20px;"></i>
+                            </a>
+                        </div>
+                    </div>
                 </nav>
 
                 <!-- Other functions wrapper -->

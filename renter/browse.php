@@ -85,15 +85,14 @@ function shortenText($text, $maxLength = 20)
         <div class="container">
             <div class="d-flex justify-content-around align-items-center w-100">
                 <a class="navbar-brand" href="browse.php">
-                    <i class="bi bi-house-fill rb"></i>
+                    <i class="bi bi-house-fill text-success"></i>
                 </a>
                 <a class="navbar-brand" href="../renter/cart.php">
                     <i class="bi bi-basket3-fill rb"></i>
                 </a>
-                <button class="btn m-0 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
-                    <i class="bi bi-person-circle r
-                    "></i>
-                </button>
+                <a class="m-0 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+                    <i class="bi bi-person-circle rb m-0 p-0" style="font-size: 20px;"></i>
+                </a>
             </div>
         </div>
     </nav>
